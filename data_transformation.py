@@ -4,6 +4,7 @@ import random
 import unicodedata
 import re
 import pickle
+from tensorflow.keras.layers import TextVectorization
 
 
 text_file = tf.keras.utils.get_file(
@@ -51,4 +52,35 @@ print(f"maximum length of line is {fre_maxlen}")
 with open("text_pairs,pickle", "wb") as fp:
     pickle.dump(text_pairs,fp)
 
-    
+# Embadding layer
+# positional layer
+# attention layer
+
+with open("text_pairs.picle", 'rb') as fp:
+    text_pairs = pickle.load(fp)
+
+random.shuffle(text_pairs)
+n_val = int(.15*len(text_pairs))
+n_train = len(text_pairs) - 2*n_val
+train_pair = text_pairs[:n_train]
+text_pair = text_pair[n_train+n_val:]
+
+vocab_en = 10000 
+vocab_fr = 20000
+seq_length = 25
+
+eng_vect = TextVectorization(
+    max_tokens = vocab_en,
+    standardize = None,
+    split = 'whitespace',
+    output_mode = 'int',
+    output_sequece_length = seq_length 
+)
+
+fre_vect = TextVectorization(
+    max_tokens = vocab_en,
+    standardize = None,
+    split = 'whitespace',
+    output_mode = 'int',
+    output_sequece_length = seq_length 
+)
