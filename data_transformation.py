@@ -156,10 +156,19 @@ def pos_enc_matrix(L, d, n = 10000):
     P[:, 1::2] = np.cos(args)
 
 class positionalEmbedding(tf.keras.layers.layer):
-    def __init__(self, seq_length, vocal_size, embed_dim, **kwargs):
+    def __init__(self, seq_length, vocab_size, embed_dim, **kwargs):
         super.__init__(**kwargs)
         self.seq_length = seq_length
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
         self.token_embeddings = tf.keras.layers.Embedding(input_dim = vocab_size, output_dim = embed_dim, mask_zero = True)
-        matrix = post_enc_matrix()
+        matrix = post_enc_matrix(seq_lenght, embed_dim)
+        self.positional_embedding = tf.constant(matrix,dtype='float32')
+
+def call(self, input):
+    embedded_tokens = self.token_embeddings(inputs)
+    return embedded_tokens + self.positional_embedding
+
+def compute_mask(self, *args, **kwargs):
+    return self.token_embeddings.computer_mask(*args, **kwargs)
+
