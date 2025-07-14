@@ -5,6 +5,8 @@ import unicodedata
 import re
 import pickle
 from tensorflow.keras.layers import TextVectorization
+import numpy as np
+
 
 
 text_file = tf.keras.utils.get_file(
@@ -139,3 +141,21 @@ for inputs,target in train_ds.take(1):
 
 
 test_ds = make_dataset(test_pair)
+
+# positional embedding
+
+def pos_enc_matrix(L, d, n = 10000):
+    assert d%2 == 0
+    d2 = d//2
+
+    P = np.zeros(L,d)
+    k = np.arrange(L).reshape(-1,1)
+    i = np.arrange(d2).reshape(-1,1)
+
+    denom = np.power(n, -i/d2)
+    args = k *denom
+
+    P[:, ::2] = np.sin(args)
+    P[:, 1::2] = np.cos(args)
+
+
