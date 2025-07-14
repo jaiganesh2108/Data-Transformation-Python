@@ -145,19 +145,19 @@ def pos_enc_matrix(L, d, n = 10000):
     assert d%2 == 0
     d2 = d//2
 
-    P = np.zeros(L,d)
+    P = np.zeros((L,d))
     k = np.arrange(L).reshape(-1,1)
-    i = np.arrange(d2).reshape(-1,1)
+    i = np.arrange(d2).reshape(1,-1)
 
     denom = np.power(n, -i/d2)
     args = k *denom
 
     P[:, ::2] = np.sin(args)
     P[:, 1::2] = np.cos(args)
-
+    return P
 class positionalEmbedding(tf.keras.layers.layer):
     def __init__(self, seq_length, vocab_size, embed_dim, **kwargs):
-        super.__init__(**kwargs)
+        super().__init__(**kwargs)
         self.seq_length = seq_length
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
@@ -172,3 +172,20 @@ def call(self, input):
 def compute_mask(self, *args, **kwargs):
     return self.token_embeddings.computer_mask(*args, **kwargs)
 
+def get_config(self):
+    config = super().get_config()
+    config.update({
+        'seq_length' : self.seq_length,
+        'vocab_size' : self.vocab_size,
+        'embed_dim' : self.embed_dim
+    })
+
+vocab_en = 10000 
+vocab_fr = 20000
+seq_length = 25
+
+for inputs, targets in train_ds.take(1):
+    print(inputs['encode_inp'])
+    embed_en = positionalEmbedding(seq_length, vocab_en, embed_dim = 512)
+
+    en_emb = embed_en(inputs['encode_inp'])
