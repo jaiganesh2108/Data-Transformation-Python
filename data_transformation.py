@@ -162,3 +162,4 @@ class positionalEmbedding(tf.keras.layers.layer):
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
         self.token_embeddings = tf.keras.layers.Embedding(input_dim = vocab_size, output_dim = embed_dim, mask_zero = True)
+        matrix = post_enc_matrix()
