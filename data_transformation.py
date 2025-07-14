@@ -7,8 +7,6 @@ import pickle
 from tensorflow.keras.layers import TextVectorization
 import numpy as np
 
-
-
 text_file = tf.keras.utils.get_file(
     fname = 'fra-eng.zip',
     origin = "http://storage.googleapis.com/download.tensorflow.org/data/fra-eng.zib",
@@ -139,7 +137,6 @@ for inputs,target in train_ds.take(1):
     print(target.shape)
     print(target[0])
 
-
 test_ds = make_dataset(test_pair)
 
 # positional embedding
@@ -165,5 +162,3 @@ class positionalEmbedding(tf.keras.layers.layer):
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
         self.token_embeddings = tf.keras.layers.Embedding(input_dim = vocab_size, output_dim = embed_dim, mask_zero = True)
-        
-    
