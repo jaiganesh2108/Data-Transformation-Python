@@ -158,4 +158,12 @@ def pos_enc_matrix(L, d, n = 10000):
     P[:, ::2] = np.sin(args)
     P[:, 1::2] = np.cos(args)
 
-
+class positionalEmbedding(tf.keras.layers.layer):
+    def __init__(self, seq_length, vocal_size, embed_dim, **kwargs):
+        super.__init__(**kwargs)
+        self.seq_length = seq_length
+        self.vocab_size = vocab_size
+        self.embed_dim = embed_dim
+        self.token_embeddings = tf.keras.layers.Embedding(input_dim = vocab_size, output_dim = embed_dim, mask_zero = True)
+        
+    
