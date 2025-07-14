@@ -63,7 +63,7 @@ random.shuffle(text_pairs)
 n_val = int(.15*len(text_pairs))
 n_train = len(text_pairs) - 2*n_val
 train_pair = text_pairs[:n_train]
-text_pair = text_pair[n_train+n_val:]
+text_pair = text_pair[n_train:n_train+n_val]
 
 vocab_en = 10000 
 vocab_fr = 20000
@@ -84,3 +84,58 @@ fre_vect = TextVectorization(
     output_mode = 'int',
     output_sequece_length = seq_length 
 )
+
+train_eng = [pair[0] for pair in train_pair]
+train_fre = [pair[1] for pair in train_pair]
+
+eng_vect.adapt(train_eng)
+eng_vect.adapt(train_fre)
+
+with open('vectorize.pickle', 'wb') as fp:
+    data = {'train' : train_pair,
+            'test' : test_pair,
+            'eng_vect' : eng_vect.get_config(),
+            'fre_vect' : fre_vect.get_config(),
+            'eng_weight' : eng_vect.get_weights(),
+            'fre_weight' : fre_vect.get_weights(),
+            }
+    pickle.dump(data, fp)
+
+with open("vectorize.pickle" , 'rb') as fp:
+    data = pickle.load(fp)
+
+train_pair  = data['train']
+test_pair = data['test']
+
+eng_vect = TextVectorization.from_config(data['eng_vect'])
+eng_vect.set_weights(data['eng_weights'])
+fre_vect = TextVectorization.frrom_config(data['fre_vect'])
+fre_vect.set_weights(data['fre_weights'])
+
+def format_dataset(eng, fre):
+    eng = eng_vect(eng)
+    fre = fre_vect(fre)
+
+    source = {'encode_inp' : eng,
+            'decode_inp' : fre[:, :-1],
+            }
+    target = fre[:, 1:]
+    return (source, target)
+
+def make_dataset(pairs, batchsize = 64): 
+    eng_text, fre_text = zip(*pairs)
+    dataset = tf.data.Dataset.from_tensor_slices(list(eng_text),list(fre_text))
+    
+    return dataset.shuffle(2048).batch(batchsize).map(format_dataset).prefetch(16).cache()
+
+train_ds = make_dataset(train_pair)
+for inputs,target in train_ds.take(1):
+    print(inputs['encode_inp'].shape)
+    print(inputs['encode_inp'][0])
+    print(inputs['encode_inp'].shape)
+    print(inputs['encode_inp'][0])
+    print(target.shape)
+    print(target[0])
+
+
+test_ds = make_dataset(test_pair)
